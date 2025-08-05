@@ -11,11 +11,7 @@ def get_momentum_stocks(tickers):
     for ticker in tickers:
         try:
             df = yf.download(ticker, period="20d", interval="1d")
-            if df.empty or 'Close' not in df.columns:
-                continue  # skip invalid or empty tickers
-
-            # Defensive coding: ensure we have at least 6 days of data
-            if len(df) < 6:
+            if df.empty or 'Close' not in df.columns or len(df) < 6:
                 continue
 
             price_change = (df['Close'][-1] - df['Close'][-6]) / df['Close'][-6]
@@ -33,3 +29,14 @@ def get_momentum_stocks(tickers):
             continue
 
     return pd.DataFrame(results)
+
+# 👇 Main logic inside button click
+if st.button("Run Scanner"):
+    with st.spinner("Scanning for momentum stocks..."):
+        df = get_momentum_stocks(tickers)
+
+    if df.empty:
+        st.info("No momentum stocks found today.")
+    else:
+        st.success(f"Found {len(df)} momentum stock(s)!")
+        st.dataframe(df)
