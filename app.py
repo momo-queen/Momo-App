@@ -11,12 +11,25 @@ def get_momentum_stocks(tickers):
     for ticker in tickers:
         try:
             df = yf.download(ticker, period="20d", interval="1d")
-            if df.empty or 'Close' not in df.columns or len(df) < 6:
+            
+            # Validate required data
+            if df.empty:
+                st.warning(f"{ticker} returned no data.")
+                continue
+            if 'Close' not in df.columns or 'Volume' not in df.columns:
+                st.warning(f"{ticker} is missing required data columns.")
+                continue
+            if len(df) < 6:
+                st.warning(f"{ticker} has less than 6 trading days of data.")
+                continue
+            if df['Close'].isna().sum() > 0 or df['Volume'].isna().sum() > 0:
+                st.warning(f"{ticker} has missing Close or Volume values.")
                 continue
 
-            price_change = (df['Close'][-1] - df['Close'][-6]) / df['Close'][-6]
+            # Momentum logic
+            price_change = (df['Close'].iloc[-1] - df['Close'].iloc[-6]) / df['Close'].iloc[-6]
             volume_avg = df['Volume'][-20:].mean()
-            volume_ratio = df['Volume'][-1] / volume_avg
+            volume_ratio = df['Volume'].iloc[-1] / volume_avg
 
             if price_change > 0.05 and volume_ratio > 1.5:
                 results.append({
@@ -24,19 +37,9 @@ def get_momentum_stocks(tickers):
                     '5d % Change': round(price_change * 100, 2),
                     'Volume Spike': round(volume_ratio, 2)
                 })
+
         except Exception as e:
-            st.write(f"Error with {ticker}: {e}")
+            st.error(f"Error with {ticker}: {str(e)}")
             continue
 
     return pd.DataFrame(results)
-
-# 👇 Main logic inside button click
-if st.button("Run Scanner"):
-    with st.spinner("Scanning for momentum stocks..."):
-        df = get_momentum_stocks(tickers)
-
-    if df.empty:
-        st.info("No momentum stocks found today.")
-    else:
-        st.success(f"Found {len(df)} momentum stock(s)!")
-        st.dataframe(df)
