@@ -5,8 +5,10 @@ import pandas as pd
 st.set_page_config(page_title="Momentum Scanner", layout="centered")
 st.title("📈 AI Momentum Stock Scanner")
 
+# Your ticker list (start with a few for testing)
 tickers = ['AAPL', 'SMCI', 'NVDA', 'AMZN', 'TSLA']
 
+# Momentum scanner logic
 def get_momentum_stocks(tickers):
     results = []
     for ticker in tickers:
@@ -23,8 +25,9 @@ def get_momentum_stocks(tickers):
                 st.warning(f"{ticker} has less than 6 days of data.")
                 continue
 
+            # Momentum logic
             price_change = (df['Close'].iloc[-1] - df['Close'].iloc[-6]) / df['Close'].iloc[-6]
             volume_avg = df['Volume'][-20:].mean()
             volume_ratio = df['Volume'].iloc[-1] / volume_avg
 
-            if price_change >_
+            if price_change_
