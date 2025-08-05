@@ -4,7 +4,7 @@ import pandas as pd
 
 st.title("📈 AI Momentum Stock Scanner")
 
-tickers = ['AAPL', 'MSFT', 'NVDA', 'AMZN', 'TSLA', 'META', 'GOOGL','OSS','RGTI','IONQ','INOD']
+tickers = ['AAPL', 'MSFT', 'NVDA', 'AMZN', 'TSLA', 'META', 'GOOGL','OSS','RGTI','IONQ','INOD','SMCI']
 
 def get_momentum_stocks(tickers):
     results = []
